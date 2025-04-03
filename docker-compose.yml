@@ -1,3 +1,6 @@
+networks:
+  etlmongodb:
+    external: true
 services:
   inserirmongodb:
     image: etlmongo-inserirmongodb:v1.0

@@ -5,7 +5,6 @@ import time
 
 import pandas as pd
 from connectMongo import ConnectMongo
-
 from exchange import QueueExchange
 
 
@@ -46,9 +45,9 @@ class InserirMongoDB:
                 lista_inserir.append(objeto_tratado)
 
             collection = db.create_collection(self.colecao)
-            print(f"Produtos Inseridos: {lista_inserir}", flush=True)
+            print(f"Produtos Inseridos", flush=True)
             result = collection.insert_many(lista_inserir)
-            print(f"Coleção Criada!: {result}", flush=True)
+            print(f"Coleção Criada!", flush=True)
         except Exception as e:
             print(e)
         finally:
