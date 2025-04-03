@@ -23,7 +23,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        
+        "https://dataflowx.tigasolutions.com.br",
+        "http://107.155.87.251:3000/",
     ],  # Permite todas as origens (use uma lista específica para segurança)
     allow_credentials=True,
     allow_methods=["*"],  # Permite todos os métodos (GET, POST, PUT, DELETE, etc.)
