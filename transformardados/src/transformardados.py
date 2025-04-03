@@ -15,6 +15,7 @@ class GetDataFromMongo:
         database = self.conn[self.database]
         collection = database[self.colecao]
         df = pd.DataFrame(list(collection.find()))
+
         df[["Altura", "Largura", "Comprimento"]] = df["dimensaoProduto"].str.extract(
             r"(\d+)\s*x\s*(\d+)\s*x\s*(\d+)"
         )
@@ -40,13 +41,21 @@ class GetDataFromMongo:
         # Formatar as datas corretamente
         df["dataProducao"] = df["dataProducao"].dt.strftime("%d/%m/%Y")
         df["dataExpiracao"] = df["dataExpiracao"].dt.strftime("%d/%m/%Y")
-        df_agrupado = df.groupby(["nome", "categoriaProduto"], as_index=False).sum()
+        df_agrupado = df.groupby(["nome", "categoriaProduto"], as_index=False).size()
 
-        vendas_totais_categoria = df_agrupado.groupby("categoriaProduto")[
-            "vendas"
-        ].transform("sum")
+        # Renomear a coluna 'size' para 'vendas'
+        df_agrupado.rename(columns={"size": "vendas"}, inplace=True)
 
-        df_agrupado["vendasTotais"] = vendas_totais_categoria
+        # Calcular vendas totais por categoria e adicionar ao DF original
+        df["vendasTotais"] = df["categoriaProduto"].map(
+            df_agrupado.groupby("categoriaProduto")["vendas"].sum()
+        )
+
+        # Substituir valores NaN por 0
+        df.fillna(0, inplace=True)
+
+        # Garantir que 'vendasTotais' é inteiro
+        df["vendasTotais"] = df["vendasTotais"].astype(int)
         # Converter a coluna _id para string (se existir)
         if "_id" in df.columns:
             df["_id"] = df["_id"].apply(

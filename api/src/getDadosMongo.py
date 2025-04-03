@@ -1,9 +1,9 @@
 import os
 import time
 
+import numpy as np
 import pandas as pd
 from connectMongo import ConnectMongo
-
 from exchange import QueueExchange
 
 
@@ -17,7 +17,17 @@ class GetDadosMongo:
         caminho = "/parquet/dados.parquet"
 
         if os.path.isfile(caminho):  # Verifica se o arquivo existe
-            return pd.read_parquet(caminho).to_dict(orient="records")
+                df = pd.read_parquet(caminho)
+
+                # Substitui valores problemáticos antes de converter para JSON
+                df.replace(
+                    [np.inf, -np.inf], np.nan, inplace=True
+                )  # Substitui infinitos por NaN
+                df.fillna(
+                    0, inplace=True
+                )  # Substitui NaN por 0 (ou outro valor adequado)
+
+                return df.to_dict(orient="records")
 
         exchange.sendMsg(
             {"colecao": self.colecao, "database": self.database, "status": False},
@@ -27,7 +37,17 @@ class GetDadosMongo:
         # Aguarda até que o arquivo apareça
         while True:
             if os.path.isfile(caminho):  # Verifica novamente se o arquivo foi criado
-                return pd.read_parquet(caminho).to_dict(orient="records")
+                df = pd.read_parquet(caminho)
+
+                # Substitui valores problemáticos antes de converter para JSON
+                df.replace(
+                    [np.inf, -np.inf], np.nan, inplace=True
+                )  # Substitui infinitos por NaN
+                df.fillna(
+                    0, inplace=True
+                )  # Substitui NaN por 0 (ou outro valor adequado)
+
+                return df.to_dict(orient="records")
             else:
                 print("DATABASE IS NOT HERE!!!!!", flush=True)
                 time.sleep(5)  # Aguarda 5 segundos antes de tentar novamente
