@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import APIRouter, FastAPI
+from fastapi.middleware.gzip import GZipMiddleware
 from getDadosMongo import GetDadosMongo
 
 router = APIRouter()
@@ -14,6 +15,7 @@ def pegarProdutos():
 app = FastAPI()
 
 # Adicionando o prefixo '/api/v1' para todas as rotas do router
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.include_router(router, prefix="/api/v1")
 
 
