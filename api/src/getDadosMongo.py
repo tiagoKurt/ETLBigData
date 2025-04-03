@@ -6,7 +6,7 @@ import pandas as pd
 from connectMongo import ConnectMongo
 from exchange import QueueExchange
 
-
+ 
 class GetDadosMongo:
     def __init__(self, colecao, database):
         self.conn = ConnectMongo().connect()
