@@ -1,32 +1,27 @@
-networks:
-  etlmongodb:
-    name: etlmongodb
-    external: true
 services:
   inserirmongodb:
     image: etlmongo-inserirmongodb:v1.0
     restart: always
     volumes:
-      - parquet:/parquet
+      - parquet:/app/app/parquet
 
   transformardados:
     image: etlmongo-transformardados:v1.0
     restart: always
     volumes:
-      - parquet:/parquet
+      - parquet:/app/app/parquet
 
   verificador:
     image: etlmongo-verificador:v1.0
     restart: always
     volumes:
-      - parquet:/parquet
+      - parquet:/app/app/parquet
   api:
     image: etlmongo-api:v1.0
     restart: always
-    networks:
-      - etlmongodb
+
     volumes:
-      - parquet:/parquet
+      - parquet:/app/app/parquet
     ports:
       - '127.0.0.1:8000:8000'
   rabbitmq:

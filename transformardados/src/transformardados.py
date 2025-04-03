@@ -63,7 +63,7 @@ class GetDataFromMongo:
             )
 
         # Agora, salvar como Parquet
-        df.to_parquet("/parquet/dados.parquet", engine="pyarrow", index=False)
+        df.to_parquet("/app/parquet/dados.parquet", engine="pyarrow", index=False)
 
 
 def callback(ch, method, properties, body):

@@ -2,7 +2,6 @@ import json
 import os
 
 from connectMongo import ConnectMongo
-
 from exchange import QueueExchange
 
 
@@ -13,7 +12,7 @@ class Verificador:
         self.database = database
 
     def verificarVariaveisDeExecucao(self):
-        caminho = "/parquet/dados.parquet"
+        caminho = "/app/parquet/dados.parquet"
         if not os.path.isfile(caminho):
             database = self.conn[self.database]
             databases = self.conn.list_database_names()

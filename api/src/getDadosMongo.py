@@ -6,7 +6,7 @@ import pandas as pd
 from connectMongo import ConnectMongo
 from exchange import QueueExchange
 
- 
+
 class GetDadosMongo:
     def __init__(self, colecao, database):
         self.conn = ConnectMongo().connect()
@@ -14,20 +14,18 @@ class GetDadosMongo:
         self.database = database
 
     def getData(self):
-        caminho = "/parquet/dados.parquet"
+        caminho = "/app/parquet/dados.parquet"
 
         if os.path.isfile(caminho):  # Verifica se o arquivo existe
-                df = pd.read_parquet(caminho)
+            df = pd.read_parquet(caminho)
 
-                # Substitui valores problemáticos antes de converter para JSON
-                df.replace(
-                    [np.inf, -np.inf], np.nan, inplace=True
-                )  # Substitui infinitos por NaN
-                df.fillna(
-                    0, inplace=True
-                )  # Substitui NaN por 0 (ou outro valor adequado)
+            # Substitui valores problemáticos antes de converter para JSON
+            df.replace(
+                [np.inf, -np.inf], np.nan, inplace=True
+            )  # Substitui infinitos por NaN
+            df.fillna(0, inplace=True)  # Substitui NaN por 0 (ou outro valor adequado)
 
-                return df.to_dict(orient="records")
+            return df.to_dict(orient="records")
 
         exchange.sendMsg(
             {"colecao": self.colecao, "database": self.database, "status": False},
