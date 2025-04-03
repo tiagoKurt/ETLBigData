@@ -26,7 +26,8 @@ services:
       - parquet:/parquet
     ports:
       - '127.0.0.1:8000:8000'
-
+    networks:
+      - etlmongodb
   rabbitmq:
     image: rabbitmq:management
     shm_size: "1gb"
