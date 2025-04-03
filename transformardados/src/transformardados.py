@@ -2,7 +2,6 @@ import json
 
 import pandas as pd
 from connectMongo import ConnectMongo
-
 from exchange import QueueExchange
 
 
@@ -41,7 +40,13 @@ class GetDataFromMongo:
         # Formatar as datas corretamente
         df["dataProducao"] = df["dataProducao"].dt.strftime("%d/%m/%Y")
         df["dataExpiracao"] = df["dataExpiracao"].dt.strftime("%d/%m/%Y")
+        df_agrupado = df.groupby(["nome", "categoriaProduto"], as_index=False).sum()
 
+        vendas_totais_categoria = df_agrupado.groupby("categoriaProduto")[
+            "vendas"
+        ].transform("sum")
+
+        df_agrupado["vendasTotais"] = vendas_totais_categoria
         # Converter a coluna _id para string (se existir)
         if "_id" in df.columns:
             df["_id"] = df["_id"].apply(
