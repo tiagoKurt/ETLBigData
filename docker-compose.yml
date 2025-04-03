@@ -1,0 +1,50 @@
+services:
+  inserirmongodb:
+    image: etlmongo-inserirmongodb:v1.0
+    restart: always
+    volumes:
+      - parquet:/parquet
+
+  transformardados:
+    image: etlmongo-transformardados:v1.0
+    restart: always
+    volumes:
+      - parquet:/parquet
+
+  verificador:
+    image: etlmongo-verificador:v1.0
+    restart: always
+    volumes:
+      - parquet:/parquet
+  api:
+    image: etlmongo-api:v1.0
+    restart: always
+    volumes:
+      - parquet:/parquet
+    ports:
+      - '8000:8000'
+
+  rabbitmq:
+    image: rabbitmq:management
+    shm_size: "1gb"
+    deploy:
+      resources:
+        limits:
+          memory: "1gb"
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: usramqp
+      RABBITMQ_DEFAULT_PASS: Qc6ZxJSBrhRVsrY
+      TZ: America/Sao_Paulo
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1k"
+        max-file: "3"
+    volumes:
+      - ./var_rabbitmq:/var/lib/rabbitmq
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - '127.0.0.1:15673:15672'
+volumes:
+  parquet:

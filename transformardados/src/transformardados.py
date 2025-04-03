@@ -1,15 +1,20 @@
-import pandas as pd
+import json
 
+import pandas as pd
 from connectMongo import ConnectMongo
+
+from exchange import QueueExchange
 
 
 class GetDataFromMongo:
-    def __init__(self):
+    def __init__(self, colecao, database):
         self.conn = ConnectMongo().connect()
+        self.colecao = colecao
+        self.database = database
 
     def transform_data(self):
-        database = self.conn["loja"]
-        collection = database["produtos"]
+        database = self.conn[self.database]
+        collection = database[self.colecao]
         df = pd.DataFrame(list(collection.find()))
         df[["Altura", "Largura", "Comprimento"]] = df["dimensaoProduto"].str.extract(
             r"(\d+)\s*x\s*(\d+)\s*x\s*(\d+)"
@@ -44,8 +49,23 @@ class GetDataFromMongo:
             )
 
         # Agora, salvar como Parquet
-        df.to_parquet("dados.parquet", engine="pyarrow", index=False)
+        df.to_parquet("/parquet/dados.parquet", engine="pyarrow", index=False)
 
-    def get_data(self):
-        self.transform_data()
-        return pd.read_parquet("dados.parquet").to_dict(orient="records")
+
+def callback(ch, method, properties, body):
+    print("SERVICE TRANSFORMARDADOS RUNNING", flush=True)
+    dado = body.decode("utf-8")
+    print(f" [x] Received {dado}", flush=True)
+    dado = json.loads(dado)
+    if dado["status"]:
+        transform = GetDataFromMongo(dado["colecao"], dado["database"])
+        transform.transform_data()
+
+
+exchange = QueueExchange(
+    host="rabbitmq",
+    service="etlmongodb-transformardados",
+    rabbit_callback=callback,
+    client="tiago",
+)
+exchange.start_consuming()
