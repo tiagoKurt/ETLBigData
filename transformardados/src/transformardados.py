@@ -47,15 +47,10 @@ class GetDataFromMongo:
         df_agrupado.rename(columns={"size": "vendas"}, inplace=True)
 
         # Calcular vendas totais por categoria e adicionar ao DF original
-        df["vendasTotais"] = df["categoriaProduto"].map(
-            df_agrupado.groupby("categoriaProduto")["vendas"].sum()
-        )
 
         # Substituir valores NaN por 0
         df.fillna(0, inplace=True)
 
-        # Garantir que 'vendasTotais' é inteiro
-        df["vendasTotais"] = df["vendasTotais"].astype(int)
         # Converter a coluna _id para string (se existir)
         if "_id" in df.columns:
             df["_id"] = df["_id"].apply(
